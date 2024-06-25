@@ -1,0 +1,10 @@
+[Unit]
+Description=Location Tracking Service
+After=step_counter.service
+
+[Service]
+ExecStart=/usr/bin/python3 /path/to/location_tracker.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
