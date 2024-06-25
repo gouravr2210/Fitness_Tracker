@@ -1,0 +1,10 @@
+[Unit]
+Description=BLE Heart Rate Monitor Service
+After=bluetooth.target
+
+[Service]
+ExecStart=/usr/bin/python3 /path/to/ble_heart_rate.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
