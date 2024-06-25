@@ -1,0 +1,10 @@
+[Unit]
+Description=Step Counter Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /path/to/step_counter.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
