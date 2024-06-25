@@ -51,4 +51,68 @@ class FitnessTrackerApp(tk.Tk):
         heart_rate = self.read_heart_rate()
         wifi_connected = self.read_wifi_status()
 
-        self.steps_label.config(text=f"
+        self.steps_label.config(text=f"Steps: {steps}")
+        self.distance_label.config(text=f"Distance: {distance:.2f} km")
+        self.location_label.config(text=f"Location: {location}")
+        self.heart_rate_label.config(text=f"Heart Rate: {heart_rate} bpm")
+        self.wifi_status_label.config(text=f"Wi-Fi: {'Connected' if wifi_connected else 'Disconnected'}")
+
+        self.after(1000, self.update_ui) 
+
+    def read_step_count(self):
+        try:
+            with open('/tmp/step_count.json', 'r') as f:
+                return json.load(f).get('steps', 0)
+        except FileNotFoundError:
+            return 0
+
+    def read_location_data(self):
+        try:
+            with open('/tmp/location_data.json', 'r') as f:
+                data = json.load(f)
+                return data.get('distance', 0), tuple(data.get('location', (0, 0)))
+        except FileNotFoundError:
+            return 0, (0, 0)
+
+    def read_heart_rate(self):
+        try:
+            with open('/tmp/heart_rate.json', 'r') as f:
+                return json.load(f).get('heart_rate', 0)
+        except FileNotFoundError:
+            return 0
+
+    def read_wifi_status(self):
+        try:
+            with open('/tmp/wifi_status.json', 'r') as f:
+                return json.load(f).get('wifi_connected', False)
+        except FileNotFoundError:
+            return False
+
+    def start_services(self):
+        commands = [
+            "sudo systemctl start step_counter.service",
+            "sudo systemctl start location_tracker.service",
+            "sudo systemctl start ble_heart_rate.service",
+            "sudo systemctl start wifi_status.service"
+        ]
+        for cmd in commands:
+            threading.Thread(target=self.run_command, args=(cmd,)).start()
+
+    def stop_services(self):
+        commands = [
+            "sudo systemctl stop step_counter.service",
+            "sudo systemctl stop location_tracker.service",
+            "sudo systemctl stop ble_heart_rate.service",
+            "sudo systemctl stop wifi_status.service"
+        ]
+        for cmd in commands:
+            threading.Thread(target=self.run_command, args=(cmd,)).start()
+
+    def run_command(self, command):
+        subprocess.run(command, shell=True)
+
+if __name__ == "__main__":
+    app = FitnessTrackerApp()
+    app.mainloop()
+
+        
